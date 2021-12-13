@@ -15,6 +15,7 @@ screen = tt.Screen()
 # tt.onscreenclick(get_pos)
 
 screen.title("Adivina")
+screen.setup(width=900, height=700)
 photo_name = next(os.walk("fotos"), (None, None, []))[2]
 map_name = next(os.walk("states"), (None, None, []))[2]
 pais = int(screen.textinput(title="Paises", prompt="Seleciona el Numero del pais que quieres juagar:\n"
@@ -28,9 +29,10 @@ states = data.state.to_list()
 guesses = []
 answer = Answer()
 
-game_on = True
-while game_on:
+while len(guesses) <= len(states):
     answer_guess = screen.textinput(title=f"Aciertos {len(guesses)}/{len(states)}", prompt="Adivina:").title()
+    if answer_guess == "Exit":
+        break
     if answer_guess not in guesses:
         if answer_guess in states:
             guesses.append(answer_guess)
@@ -41,4 +43,6 @@ while game_on:
     else:
         screen.textinput(title="Repetido", prompt="Repuesta Repetida")
 
-tt.mainloop()
+# general csv con los estados que faltaron por adivinar
+misses = [miss for miss in states if miss not in guesses]
+pandas.DataFrame(misses).to_csv("states_to_learn.csv")
